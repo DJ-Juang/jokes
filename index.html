@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>笑話瀏覽趣 v2</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --primary-hover: #357abd;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-muted: #666666;
+            --fav-color: #e74c3c;
+            --border-color: #e1e4e8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background-color: #e1e4e8;
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .jokes-container {
+            width: 100%;
+            max-width: 800px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .joke-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+        }
+
+        .joke-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .joke-title {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-right: 30px;
+            font-weight: bold;
+        }
+
+        .fav-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #ccc;
+            transition: transform 0.1s ease;
+        }
+
+        .fav-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .fav-btn.active {
+            color: var(--fav-color);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .page-btn {
+            padding: 8px 14px;
+            min-width: 40px;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            color: var(--text-color);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background-color: var(--bg-color);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .page-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .page-btn:disabled {
+            background-color: #f5f5f5;
+            color: #ccc;
+            cursor: not-allowed;
+            border-color: #e1e4e8;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background-color: white;
+            width: 90%;
+            max-width: 550px;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-overlay.open .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-right: 30px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 10px;
+        }
+
+        .modal-body {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #4a5568;
+            white-space: pre-line;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>笑話瀏覽趣</h1>
+        <div class="tabs">
+            <button id="tab-all" class="tab-btn active" onclick="switchMode('all')">全部笑話 (0)</button>
+            <button id="tab-fav" class="tab-btn" onclick="switchMode('fav')">我的收藏 ❤️ (0)</button>
+        </div>
+        <div class="search-container">
+            <input type="text" id="search-input" class="search-input" placeholder="搜尋笑話標題或關鍵字..." oninput="handleSearch()">
+        </div>
+    </header>
+
+    <div id="jokes-container" class="jokes-container">
+        </div>
+
+    <div id="pagination" class="pagination">
+        </div>
+
+    <div id="joke-modal" class="modal-overlay" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="modal-joke-title" class="modal-title"></div>
+            <div id="modal-joke-body" class="modal-body"></div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+
+</body>
+</html>
