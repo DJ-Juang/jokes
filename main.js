@@ -97,6 +97,7 @@ function renderJokes() {
     // 產生分頁按鈕
     paginationContainer.innerHTML = '';
     if (totalPages > 1) {
+        // 1. 上一頁按鈕
         const prevBtn = document.createElement('button');
         prevBtn.className = 'page-btn';
         prevBtn.innerText = '上一頁';
@@ -104,7 +105,29 @@ function renderJokes() {
         prevBtn.onclick = () => changePage(currentPage - 1);
         paginationContainer.appendChild(prevBtn);
 
-        for (let i = 1; i <= totalPages; i++) {
+        // 💡 2. 動態計算最多只顯示 10 頁的範圍
+        let startPage = 1;
+        let endPage = totalPages;
+
+        if (totalPages > 10) {
+            // 讓目前頁面儘量保持在 10 個按鈕的中間（前面留 4 頁，後面留 5 頁）
+            startPage = currentPage - 4;
+            endPage = currentPage + 5;
+
+            // 防呆：如果算出來太前面，就固定從第 1 頁開始算 10 頁
+            if (startPage < 1) {
+                startPage = 1;
+                endPage = 10;
+            }
+            // 防呆：如果算出來太後面，就固定最後 10 頁
+            if (endPage > totalPages) {
+                endPage = totalPages;
+                startPage = totalPages - 9;
+            }
+        }
+
+        // 3. 根據算好的範圍，動態產生頁碼按鈕
+        for (let i = startPage; i <= endPage; i++) {
             const pageBtn = document.createElement('button');
             pageBtn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
             pageBtn.innerText = i;
@@ -112,6 +135,7 @@ function renderJokes() {
             paginationContainer.appendChild(pageBtn);
         }
 
+        // 4. 下一頁按鈕
         const nextBtn = document.createElement('button');
         nextBtn.className = 'page-btn';
         nextBtn.innerText = '下一頁';
@@ -195,6 +219,27 @@ async function loadJokesFromServer() {
         }
     }
 }
+// main.js 中下方
+window.resetFavorites = function() {
+    // 彈出視窗詢問使用者，確認後才刪除
+    if (confirm('確定要清空所有收藏的笑話嗎？')) {
+        // 1. 將本機儲存空間的紀錄刪除
+        localStorage.removeItem('joke_favorites');
+        
+        // 2. 將程式內部的變數重設為空陣列
+        favoriteIds = [];
+        
+        // 3. 強制切換回「全部笑話」模式（避免停留在空無一物的收藏頁面）
+        currentMode = 'all';
+        const tabAll = document.getElementById('tab-all');
+        const tabFav = document.getElementById('tab-fav');
+        if (tabAll) tabAll.classList.add('active');
+        if (tabFav) tabFav.classList.remove('active');
+        
+        // 4. 重新渲染畫面
+        renderJokes();
+    }
+};
 
 // ==========================================
 // 6. 整個檔案的最底部，啟動執行
