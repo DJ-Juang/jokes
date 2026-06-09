@@ -4,7 +4,7 @@
 let allJokes = []; 
 let currentMode = 'all';
 let currentPage = 1;
-const itemsPerPage = 6;
+const itemsPerPage = 9;
 let searchQuery = '';
 let favoriteIds = JSON.parse(localStorage.getItem('joke_favorites')) || [];
 
@@ -117,21 +117,21 @@ function renderJokes() {
         prevBtn.onclick = () => changePage(currentPage - 1);
         paginationContainer.appendChild(prevBtn);
 
-        // 3. 動態計算最多只顯示 10 頁的範圍
+        // 3. 動態計算最多只顯示 6 頁的範圍
         let startPage = 1;
         let endPage = totalPages;
 
-        if (totalPages > 10) {
-            startPage = currentPage - 4;
-            endPage = currentPage + 5;
+        if (totalPages > 6) {
+            startPage = currentPage - 2;
+            endPage = currentPage + 3;
 
             if (startPage < 1) {
                 startPage = 1;
-                endPage = 10;
+                endPage = 6;
             }
             if (endPage > totalPages) {
                 endPage = totalPages;
-                startPage = totalPages - 9;
+                startPage = totalPages - 5;
             }
         }
 
