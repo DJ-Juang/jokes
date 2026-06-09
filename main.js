@@ -94,10 +94,22 @@ function renderJokes() {
         container.appendChild(card);
     });
 
-    // 產生分頁按鈕
+    // ==========================================
+    // 產生分頁按鈕 (包含 <<, 上一頁, 頁碼, 下一頁, >>)
+    // ==========================================
     paginationContainer.innerHTML = '';
     if (totalPages > 1) {
-        // 1. 上一頁按鈕
+        
+        // 💡 1. 到第一頁按鈕 (<<)
+        const firstBtn = document.createElement('button');
+        firstBtn.className = 'page-btn';
+        firstBtn.innerText = '<<';
+        firstBtn.title = '到第一頁';
+        firstBtn.disabled = currentPage === 1;
+        firstBtn.onclick = () => changePage(1);
+        paginationContainer.appendChild(firstBtn);
+
+        // 2. 上一頁按鈕
         const prevBtn = document.createElement('button');
         prevBtn.className = 'page-btn';
         prevBtn.innerText = '上一頁';
@@ -105,28 +117,25 @@ function renderJokes() {
         prevBtn.onclick = () => changePage(currentPage - 1);
         paginationContainer.appendChild(prevBtn);
 
-        // 💡 2. 動態計算最多只顯示 10 頁的範圍
+        // 3. 動態計算最多只顯示 10 頁的範圍
         let startPage = 1;
         let endPage = totalPages;
 
         if (totalPages > 10) {
-            // 讓目前頁面儘量保持在 10 個按鈕的中間（前面留 4 頁，後面留 5 頁）
             startPage = currentPage - 4;
             endPage = currentPage + 5;
 
-            // 防呆：如果算出來太前面，就固定從第 1 頁開始算 10 頁
             if (startPage < 1) {
                 startPage = 1;
                 endPage = 10;
             }
-            // 防呆：如果算出來太後面，就固定最後 10 頁
             if (endPage > totalPages) {
                 endPage = totalPages;
                 startPage = totalPages - 9;
             }
         }
 
-        // 3. 根據算好的範圍，動態產生頁碼按鈕
+        // 4. 根據算好的範圍，動態產生頁碼按鈕
         for (let i = startPage; i <= endPage; i++) {
             const pageBtn = document.createElement('button');
             pageBtn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
@@ -135,13 +144,22 @@ function renderJokes() {
             paginationContainer.appendChild(pageBtn);
         }
 
-        // 4. 下一頁按鈕
+        // 5. 下一頁按鈕
         const nextBtn = document.createElement('button');
         nextBtn.className = 'page-btn';
         nextBtn.innerText = '下一頁';
         nextBtn.disabled = currentPage === totalPages;
         nextBtn.onclick = () => changePage(currentPage + 1);
         paginationContainer.appendChild(nextBtn);
+
+        // 💡 6. 到最後一頁按鈕 (>>)
+        const lastBtn = document.createElement('button');
+        lastBtn.className = 'page-btn';
+        lastBtn.innerText = '>>';
+        lastBtn.title = '到最後一頁';
+        lastBtn.disabled = currentPage === totalPages;
+        lastBtn.onclick = () => changePage(totalPages);
+        paginationContainer.appendChild(lastBtn);
     }
 }
 
