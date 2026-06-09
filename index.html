@@ -261,6 +261,10 @@
         <div class="tabs">
             <button id="tab-all" class="tab-btn active" onclick="switchMode('all')">全部笑話 (0)</button>
             <button id="tab-fav" class="tab-btn" onclick="switchMode('fav')">我的收藏 ❤️ (0)</button>
+            <button onclick="resetFavorites()" style="padding: 3px 6px; background-color: #95b5b6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 8px;">
+    清空收藏 🔄
+</button>
+
         </div>
         <div class="search-container">
             <input type="text" id="search-input" class="search-input" placeholder="搜尋笑話標題或關鍵字..." oninput="handleSearch()">
